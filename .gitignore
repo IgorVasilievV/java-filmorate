@@ -44,3 +44,9 @@ build/
 
 *.db
 db/*
+
+#custom
+/mvnw
+/mvnw.cmd
+/.DS_Store
+/*.json
