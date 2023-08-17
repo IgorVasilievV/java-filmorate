@@ -30,7 +30,7 @@ public class FilmController {
                 id = film.getId();
             }
             films.add(film);
-            log.debug("Добавлен фильм: {}", film.toString());
+            log.debug("Добавлен фильм: {}", film);
             return film;
     }
 
@@ -39,7 +39,7 @@ public class FilmController {
         Film oldFilm = validateFilmBeforeUpdated(film);
         films.remove(oldFilm);
         films.add(film);
-        log.debug("Обновлен фильм id={}. Новые данные: {}", film.getId(), film.toString());
+        log.debug("Обновлен фильм id={}. Новые данные: {}", film.getId(), film);
         return film;
     }
 

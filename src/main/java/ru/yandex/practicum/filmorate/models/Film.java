@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.models;
 
-import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.Accessors;
 

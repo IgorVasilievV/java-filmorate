@@ -31,7 +31,7 @@ public class UserController {
             user.setName(user.getLogin());
         }
         users.add(user);
-        log.debug("Добавлен пользователь: {}", user.toString());
+        log.debug("Добавлен пользователь: {}", user);
         return user;
     }
 
@@ -41,7 +41,7 @@ public class UserController {
         User oldUser = validationBeforeUpdatedUser(user);
         users.remove(oldUser);
         users.add(user);
-        log.debug("Данные пользователя id= {} обновлены. Новые данные: {}", user.getId(), user.toString());
+        log.debug("Данные пользователя id= {} обновлены. Новые данные: {}", user.getId(), user);
         return user;
     }
 

@@ -21,37 +21,37 @@ public class FilmControllerTest {
     private Film filmWithNegativeDuration;
 
     @BeforeEach
-    private void createFilmControllerInstant() {
+    public void createFilmControllerInstant() {
         filmController = new FilmController();
     }
 
     @BeforeEach
-    private void createFilm() {
+    public void createFilm() {
         filmValid = new Film()
                 .setName("Terminator")
                 .setDescription("3 parts")
-                .setReleaseDate(LocalDate.of(2000, 01, 29))
+                .setReleaseDate(LocalDate.of(2000, 1, 29))
                 .setDuration(30);
         filmWithoutName = new Film()
                 .setDescription("3 parts")
-                .setReleaseDate(LocalDate.of(2000, 01, 29))
+                .setReleaseDate(LocalDate.of(2000, 1, 29))
                 .setDuration(30);
         filmWithOverLengthDescription = new Film()
                 .setName("Terminator")
                 .setDescription("Over length description>Over length description>Over length description>" +
                         "Over length description>Over length description>Over length description>" +
                         "Over length description>Over length description>Over length description>")
-                .setReleaseDate(LocalDate.of(2000, 01, 29))
+                .setReleaseDate(LocalDate.of(2000, 1, 29))
                 .setDuration(30);
         filmWithOlderRelease = new Film()
                 .setName("Terminator")
                 .setDescription("3 parts")
-                .setReleaseDate(LocalDate.of(1500, 01, 29))
+                .setReleaseDate(LocalDate.of(1500, 1, 29))
                 .setDuration(30);
         filmWithNegativeDuration = new Film()
                 .setName("Terminator")
                 .setDescription("3 parts")
-                .setReleaseDate(LocalDate.of(2000, 01, 29))
+                .setReleaseDate(LocalDate.of(2000, 1, 29))
                 .setDuration(-30);
     }
 

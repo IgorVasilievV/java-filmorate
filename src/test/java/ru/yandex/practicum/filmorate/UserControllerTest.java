@@ -22,40 +22,40 @@ public class UserControllerTest {
     private User userWithInvalidBirthday;
 
     @BeforeEach
-    private void createUserControllerInstant() {
+    public void createUserControllerInstant() {
         userController = new UserController();
     }
 
     @BeforeEach
-    private void createUser() {
+    public void createUser() {
         userValid = new User()
                 .setEmail("practicum@mail.ru")
                 .setLogin("login")
                 .setName("Vasya")
-                .setBirthday(LocalDate.of(2000, 12, 01));
+                .setBirthday(LocalDate.of(2000, 12, 1));
         userWithEmptyEmail = new User()
                 .setLogin("login")
                 .setName("Vasya")
-                .setBirthday(LocalDate.of(2000, 12, 01));
+                .setBirthday(LocalDate.of(2000, 12, 1));
         userWithInvalidEmail = new User()
                 .setEmail("@practicummail.ru")
                 .setLogin("login")
                 .setName("Vasya")
-                .setBirthday(LocalDate.of(2000, 12, 01));
+                .setBirthday(LocalDate.of(2000, 12, 1));
         userWithEmptyLogin = new User()
                 .setEmail("practicum@mail.ru")
                 .setName("Vasya")
-                .setBirthday(LocalDate.of(2000, 12, 01));
+                .setBirthday(LocalDate.of(2000, 12, 1));
         userWithInvalidLogin = new User()
                 .setEmail("practicum@mail.ru")
                 .setLogin("log in")
                 .setName("Vasya")
-                .setBirthday(LocalDate.of(2000, 12, 01));
+                .setBirthday(LocalDate.of(2000, 12, 1));
         userWithInvalidBirthday = new User()
                 .setEmail("practicum@mail.ru")
                 .setLogin("login")
                 .setName("Vasya")
-                .setBirthday(LocalDate.of(3000, 12, 01));
+                .setBirthday(LocalDate.of(3000, 12, 1));
     }
 
     @Test
