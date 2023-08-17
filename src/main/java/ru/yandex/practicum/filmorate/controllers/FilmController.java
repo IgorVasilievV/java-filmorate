@@ -19,7 +19,7 @@ public class FilmController {
 
     private int id = 0;
     private final List<Film> films = new ArrayList<>();
-    private final LocalDate BIRTHDAY_CINEMA = LocalDate.of(1895, Month.DECEMBER, 28);
+    private final LocalDate birthdayCinema = LocalDate.of(1895, Month.DECEMBER, 28);
 
     @PostMapping
     public Film addFilm(@RequestBody @Valid Film film) {
@@ -58,7 +58,7 @@ public class FilmController {
             ValidationException e = new ValidationException("Длина описания фильма превышает 200 символов");
             log.debug("Валидация не пройдена. " + e.getMessage());
             throw e;
-        } else if (film.getReleaseDate().isBefore(BIRTHDAY_CINEMA)) {
+        } else if (film.getReleaseDate().isBefore(birthdayCinema)) {
             ValidationException e = new ValidationException("Дата релиза фильма раньше 28-12-1895");
             log.debug("Валидация не пройдена. " + e.getMessage());
             throw e;
