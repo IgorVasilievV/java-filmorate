@@ -7,16 +7,14 @@ import ru.yandex.practicum.filmorate.models.User;
 
 import javax.validation.Valid;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.regex.Pattern;
 
 @RestController
 @RequestMapping("/users")
 @Slf4j
 public class UserController {
-    private final List<User> users = new ArrayList<>();
+    private final Map<Integer,User> users = new HashMap<>();
     private int id = 0;
 
     @PostMapping
@@ -30,7 +28,7 @@ public class UserController {
         if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());
         }
-        users.add(user);
+        users.put(user.getId(), user);
         log.debug("Добавлен пользователь: {}", user);
         return user;
     }
@@ -38,16 +36,15 @@ public class UserController {
 
     @PutMapping
     public User updateUser(@RequestBody @Valid User user) {
-        User oldUser = validationBeforeUpdatedUser(user);
-        users.remove(oldUser);
-        users.add(user);
+        validationBeforeUpdatedUser(user);
+        users.put(user.getId(), user);
         log.debug("Данные пользователя id= {} обновлены. Новые данные: {}", user.getId(), user);
         return user;
     }
 
     @GetMapping
     public List<User> getAllUsers() {
-        return users;
+        return new ArrayList<>(users.values());
     }
 
     private void validationBeforeCreateUser(User user) throws ValidationException {
@@ -67,16 +64,11 @@ public class UserController {
         }
     }
 
-    private User validationBeforeUpdatedUser(User user) throws ValidationException {
-        Optional<User> oldUser = users.stream()
-                .filter(u -> user.getId() == u.getId())
-                .findFirst();
-        if (oldUser.isEmpty()) {
+    private void validationBeforeUpdatedUser(User user) throws ValidationException {
+        if (!users.containsKey(user.getId())) {
             ValidationException e = new ValidationException("Пользователь с id= " + user.getId() + " не найден");
             log.debug("Валидация не пройдена. " + e.getMessage());
             throw e;
-        } else {
-            return oldUser.get();
         }
     }
 }
