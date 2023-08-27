@@ -7,11 +7,12 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import java.time.LocalDate;
+import java.util.Set;
 
 @Data
 @Accessors(chain = true)
 public class Film {
-    private int id;
+    private long id;
     @NotNull
     @NotBlank
     private String name;
@@ -21,6 +22,7 @@ public class Film {
     private LocalDate releaseDate;
     @Positive
     private double duration;
+    Set<Long> likes;
 
 
 }

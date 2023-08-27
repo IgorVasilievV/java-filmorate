@@ -8,11 +8,12 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
 import java.time.LocalDate;
+import java.util.Set;
 
 @Data
 @Accessors(chain = true)
 public class User {
-    private int id;
+    private long id;
     @NotNull
     @NotBlank
     @Email
@@ -23,5 +24,6 @@ public class User {
     private String name;
     @Past
     private LocalDate birthday;
+    private Set<Long> friends;
 
 }
