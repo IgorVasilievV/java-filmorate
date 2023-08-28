@@ -1,14 +1,13 @@
 package ru.yandex.practicum.filmorate.service.film;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.models.Film;
-import ru.yandex.practicum.filmorate.models.User;
-import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
-import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.time.LocalDate;
 import java.time.Month;
@@ -17,49 +16,37 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class FilmService {
 
-    private long id = 0;
     private final LocalDate birthdayCinema = LocalDate.of(1895, Month.DECEMBER, 28);
-
-    private final Map<Long, Film> films;
-    private final Map<Long, User> users;
-
-    @Autowired
-    public FilmService(InMemoryFilmStorage filmStorage, InMemoryUserStorage userStorage) {
-        films = filmStorage.getFilms();
-        users = userStorage.getUsers();
-    }
+    private final FilmStorage filmStorage;
+    private final UserStorage userStorage;
 
     public Film addFilm(Film film) {
         validateFilmBeforeAdded(film);
-        if (film.getId() == 0) {
-            film.setId(++id);
-        } else {
-            id = film.getId();
-        }
-        films.put(film.getId(), film);
+        filmStorage.addFilm(film);
         log.debug("Добавлен фильм: {}", film);
         return film;
     }
 
     public Film updateFilm(Film film) {
         validateFilmBeforeUpdated(film);
-        films.replace(film.getId(), film);
+        filmStorage.updateFilm(film);
         log.debug("Обновлен фильм id={}. Новые данные: {}", film.getId(), film);
         return film;
     }
 
     public Film getFilm(long id) {
-        if (films.containsKey(id)) {
-            return films.get(id);
-        } else {
-            throw new NotFoundException("В хранилище нет фильма с id = " + id);
-        }
+        return filmStorage.getFilm(id);
+    }
+
+    public Film removeFilm(long id) {
+        return filmStorage.removeFilm(id);
     }
 
     public List<Film> getAllFilms() {
-        return new ArrayList<>(films.values());
+        return new ArrayList<>(filmStorage.getFilms().values());
     }
 
 
@@ -84,7 +71,7 @@ public class FilmService {
     }
 
     private void validateFilmBeforeUpdated(Film film) throws ValidationException {
-        if (!films.containsKey(film.getId())) {
+        if (!filmStorage.getFilms().containsKey(film.getId())) {
             NotFoundException e = new NotFoundException("Фильм с id= " + film.getId() + " не найден");
             log.debug("Валидация не пройдена. " + e.getMessage());
             throw e;
@@ -92,8 +79,8 @@ public class FilmService {
     }
 
     public void addLike(long idFilm, long idUser) {
-        if (films.containsKey(idFilm) && users.containsKey(idUser)) {
-            Film film = films.get(idFilm);
+        if (filmStorage.getFilms().containsKey(idFilm) && userStorage.getUsers().containsKey(idUser)) {
+            Film film = filmStorage.getFilms().get(idFilm);
             if (film.getLikes() == null) {
                 film.setLikes(new HashSet<>());
             }
@@ -104,8 +91,8 @@ public class FilmService {
     }
 
     public void deleteLike(long idFilm, long idUser) {
-        if (films.containsKey(idFilm) && users.containsKey(idUser)) {
-            Film film = films.get(idFilm);
+        if (filmStorage.getFilms().containsKey(idFilm) && userStorage.getUsers().containsKey(idUser)) {
+            Film film = filmStorage.getFilms().get(idFilm);
             if (film.getLikes() != null) {
                 film.getLikes().remove(idUser);
             }
@@ -115,7 +102,7 @@ public class FilmService {
     }
 
     public Set<Film> getPopularFilms(int count) {
-        Set<Film> popularFilms = films.values().stream()
+        Set<Film> popularFilms = filmStorage.getFilms().values().stream()
                 .sorted((film1, film2) -> {
                     if (film2.getLikes() != null && film1.getLikes() != null) {
                         return film2.getLikes().size() - film1.getLikes().size();

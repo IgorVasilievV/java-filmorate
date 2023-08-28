@@ -1,12 +1,12 @@
 package ru.yandex.practicum.filmorate.service.user;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.models.User;
-import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -14,27 +14,14 @@ import java.util.regex.Pattern;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class UserService {
 
-    private final Map<Long, User> users;
-    private long id = 0;
-
-    @Autowired
-    public UserService(InMemoryUserStorage userStorage) {
-        users = userStorage.getUsers();
-    }
+    private final UserStorage userStorage;
 
     public User createUser(User user) {
         validationBeforeCreateUser(user);
-        if (user.getId() == 0) {
-            user.setId(++id);
-        } else {
-            id = user.getId();
-        }
-        if (user.getName() == null || user.getName().isBlank()) {
-            user.setName(user.getLogin());
-        }
-        users.put(user.getId(), user);
+        userStorage.createUser(user);
         log.debug("Добавлен пользователь: {}", user);
         return user;
     }
@@ -42,22 +29,21 @@ public class UserService {
 
     public User updateUser(User user) {
         validationBeforeUpdatedUser(user);
-        users.put(user.getId(), user);
+        userStorage.updateUser(user);
         log.debug("Данные пользователя id= {} обновлены. Новые данные: {}", user.getId(), user);
         return user;
     }
 
     public User getUser(long id) {
-        if (users.containsKey(id)) {
-            User user = users.get(id);
-            return user;
-        } else {
-            throw new NotFoundException("В хранилище нет пользователя с id = " + id);
-        }
+        return userStorage.getUser(id);
+    }
+
+    public User removeUser(long id) {
+        return userStorage.removeUser(id);
     }
 
     public List<User> getAllUsers() {
-        return new ArrayList<>(users.values());
+        return new ArrayList<>(userStorage.getUsers().values());
     }
 
     private void validationBeforeCreateUser(User user) throws ValidationException {
@@ -78,7 +64,7 @@ public class UserService {
     }
 
     private void validationBeforeUpdatedUser(User user) throws ValidationException {
-        if (!users.containsKey(user.getId())) {
+        if (!userStorage.getUsers().containsKey(user.getId())) {
             NotFoundException e = new NotFoundException("Пользователь с id= " + user.getId() + " не найден");
             log.debug("Валидация не пройдена. " + e.getMessage());
             throw e;
@@ -86,31 +72,31 @@ public class UserService {
     }
 
     public void addFriend(long idUser, long idFriend) {
-        if (users.keySet().containsAll(List.of(idUser, idFriend))) {
-            User user = users.get(idUser);
-            User friend = users.get(idFriend);
-            if (user.getFriends() == null) {
-                user.setFriends(new HashSet<>());
+        if (userStorage.getUsers().keySet().containsAll(List.of(idUser, idFriend))) {
+            User user = userStorage.getUsers().get(idUser);
+            User friend = userStorage.getUsers().get(idFriend);
+            if (user.getFriendsIds() == null) {
+                user.setFriendsIds(new HashSet<>());
             }
-            if (friend.getFriends() == null) {
-                friend.setFriends(new HashSet<>());
+            if (friend.getFriendsIds() == null) {
+                friend.setFriendsIds(new HashSet<>());
             }
-            user.getFriends().add(idFriend);
-            friend.getFriends().add(idUser);
+            user.getFriendsIds().add(idFriend);
+            friend.getFriendsIds().add(idUser);
         } else {
             throw new NotFoundException("В хранилище нет указанных id");
         }
     }
 
     public void deleteFriend(long idUser, long idFriend) {
-        if (users.keySet().containsAll(List.of(idUser, idFriend))) {
-            User user = users.get(idUser);
-            User friend = users.get(idFriend);
-            if (user.getFriends() != null) {
-                user.getFriends().remove(idFriend);
+        if (userStorage.getUsers().keySet().containsAll(List.of(idUser, idFriend))) {
+            User user = userStorage.getUsers().get(idUser);
+            User friend = userStorage.getUsers().get(idFriend);
+            if (user.getFriendsIds() != null) {
+                user.getFriendsIds().remove(idFriend);
             }
-            if (friend.getFriends() != null) {
-                friend.getFriends().remove(idUser);
+            if (friend.getFriendsIds() != null) {
+                friend.getFriendsIds().remove(idUser);
             }
         } else {
             throw new NotFoundException("В хранилище нет указанных id");
@@ -118,11 +104,11 @@ public class UserService {
     }
 
     public List<User> getFriends(long idUser) {
-        if (users.containsKey(idUser)) {
+        if (userStorage.getUsers().containsKey(idUser)) {
             List<User> friends = new ArrayList<>();
-            if (users.get(idUser).getFriends() != null) {
-                Set<Long> idFriend = users.get(idUser).getFriends();
-                idFriend.forEach(s -> friends.add(users.get(s)));
+            if (userStorage.getUsers().get(idUser).getFriendsIds() != null) {
+                Set<Long> idFriend = userStorage.getUsers().get(idUser).getFriendsIds();
+                idFriend.forEach(s -> friends.add(userStorage.getUsers().get(s)));
             }
             return friends;
         } else {
@@ -131,15 +117,15 @@ public class UserService {
     }
 
     public List<User> getCommonFriends(long idUser, long idFriend) {
-        if (users.keySet().containsAll(List.of(idUser, idFriend))) {
-            User user = users.get(idUser);
-            User friend = users.get(idFriend);
+        if (userStorage.getUsers().keySet().containsAll(List.of(idUser, idFriend))) {
+            User user = userStorage.getUsers().get(idUser);
+            User friend = userStorage.getUsers().get(idFriend);
             List<User> commonFriends = new ArrayList<>();
-            if (user.getFriends() != null && friend.getFriends() != null) {
-                Set<Long> idCommonFriends = new HashSet<>(user.getFriends());
-                idCommonFriends.retainAll(friend.getFriends());
+            if (user.getFriendsIds() != null && friend.getFriendsIds() != null) {
+                Set<Long> idCommonFriends = new HashSet<>(user.getFriendsIds());
+                idCommonFriends.retainAll(friend.getFriendsIds());
                 if (!idCommonFriends.isEmpty()) {
-                    idCommonFriends.forEach(s -> commonFriends.add(users.get(s)));
+                    idCommonFriends.forEach(s -> commonFriends.add(userStorage.getUsers().get(s)));
                 }
             }
             return commonFriends;
