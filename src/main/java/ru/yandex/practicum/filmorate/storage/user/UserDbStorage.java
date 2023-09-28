@@ -11,7 +11,7 @@ import java.util.Map;
 
 @Repository("userDbStorage")
 @RequiredArgsConstructor
-public class UserDbStorage implements UserStorage{
+public class UserDbStorage implements UserStorage {
 
     private final UserDao userDao;
 
@@ -43,12 +43,12 @@ public class UserDbStorage implements UserStorage{
 
     @Override
     public void addFriend(long idUser, long idFriend) {
-        userDao.addFriend(idUser,idFriend);
+        userDao.addFriend(idUser, idFriend);
     }
 
     @Override
     public void deleteFriend(long idUser, long idFriend) {
-        userDao.deleteFriend(idUser,idFriend);
+        userDao.deleteFriend(idUser, idFriend);
     }
 
     @Override

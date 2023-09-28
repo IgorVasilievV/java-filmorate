@@ -6,7 +6,7 @@ import ru.yandex.practicum.filmorate.models.Genre;
 import java.util.List;
 
 @Repository
-public class InMemoryGenreStorage implements GenreStorage{
+public class InMemoryGenreStorage implements GenreStorage {
     @Override
     public List<Genre> getGenres() {
         return null;

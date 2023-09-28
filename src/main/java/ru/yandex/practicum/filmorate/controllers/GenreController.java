@@ -17,7 +17,7 @@ public class GenreController {
     private final GenreService genreService;
 
     @GetMapping
-    public List<Genre> getGenres(){
+    public List<Genre> getGenres() {
         return genreService.getGenres();
     }
 

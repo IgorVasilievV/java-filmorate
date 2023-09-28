@@ -10,9 +10,10 @@ import java.util.List;
 
 @Repository("genreDbStorage")
 @RequiredArgsConstructor
-public class GenreDbStorage implements GenreStorage{
+public class GenreDbStorage implements GenreStorage {
 
     private final GenreDao genreDao;
+
     @Override
     public List<Genre> getGenres() {
         return genreDao.getGenres();

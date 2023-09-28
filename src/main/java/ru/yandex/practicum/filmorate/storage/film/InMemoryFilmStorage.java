@@ -48,6 +48,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         return Optional.ofNullable(films.remove(id))
                 .orElseThrow(() -> new NotFoundException("В хранилище нет фильма с id = " + id));
     }
+
     @Override
     public void addLike(long idFilm, long idUser) {
         if (films.containsKey(idFilm)) {

@@ -6,7 +6,7 @@ import ru.yandex.practicum.filmorate.models.Mpa;
 import java.util.List;
 
 @Repository("inMemoryMpaStorage")
-public class InMemoryMpaStorage implements MpaStorage{
+public class InMemoryMpaStorage implements MpaStorage {
     @Override
     public List<Mpa> getMpaes() {
         return null;

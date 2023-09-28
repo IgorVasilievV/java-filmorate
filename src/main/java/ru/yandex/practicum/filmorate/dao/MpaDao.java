@@ -8,5 +8,6 @@ import java.util.Optional;
 public interface MpaDao {
 
     Optional<Mpa> getMpa(long id);
+
     List<Mpa> getMpaes();
 }

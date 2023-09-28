@@ -41,7 +41,7 @@ public class GenreDaoImpl implements GenreDao {
     @Override
     public List<Genre> getGenres() {
         String sql = "select * from genre";
-        return jdbcTemplate.query(sql, (rs, rowNum)-> makeGenre(rs));
+        return jdbcTemplate.query(sql, (rs, rowNum) -> makeGenre(rs));
     }
 
     private Genre makeGenre(ResultSet rs) throws SQLException {

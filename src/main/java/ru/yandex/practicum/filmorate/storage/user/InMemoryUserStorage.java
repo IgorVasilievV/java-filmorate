@@ -56,12 +56,6 @@ public class InMemoryUserStorage implements UserStorage {
             if (friend.getFriendsIds() == null) {
                 friend.setFriendsIds(new HashMap<>());
             }
-            /*if (!user.getFriendsIds().containsKey(idFriend)) {
-                user.getFriendsIds().put(idFriend, false);
-            } else {
-                user.getFriendsIds().put(idFriend, true);
-                friend.getFriendsIds().put(idUser, true);
-            }*/
             if (!friend.getFriendsIds().containsKey(idUser)) {
                 user.getFriendsIds().put(idFriend, false);
             } else {
@@ -81,7 +75,7 @@ public class InMemoryUserStorage implements UserStorage {
             if (user.getFriendsIds() != null) {
                 user.getFriendsIds().remove(idFriend);
                 if (friend.getFriendsIds() != null && friend.getFriendsIds().containsKey(idUser)) {
-                    friend.getFriendsIds().put(idUser,false);
+                    friend.getFriendsIds().put(idUser, false);
                 }
             }
         } else {

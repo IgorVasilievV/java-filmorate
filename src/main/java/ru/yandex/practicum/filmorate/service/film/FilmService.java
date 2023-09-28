@@ -90,7 +90,7 @@ public class FilmService {
     }
 
     public void deleteLike(long idFilm, long idUser) {
-       filmStorage.deleteLike(idFilm, idUser);
+        filmStorage.deleteLike(idFilm, idUser);
     }
 
     public Set<Film> getPopularFilms(int count) {

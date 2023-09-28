@@ -137,18 +137,18 @@ class FilmorateApplicationTests {
                 );
 
         filmStorage.addLike(1, 1);
-		assertThat(filmStorage.getFilm(1).getLikes().size()).isEqualTo(1);
+        assertThat(filmStorage.getFilm(1).getLikes().size()).isEqualTo(1);
 
-		filmStorage.deleteLike(1, 1);
-		assertThat(filmStorage.getFilm(1).getLikes().size()).isEqualTo(0);
+        filmStorage.deleteLike(1, 1);
+        assertThat(filmStorage.getFilm(1).getLikes().size()).isEqualTo(0);
 
-		filmStorage.removeFilm(1);
-		filmsOptional = Optional.of(filmStorage.getFilms());
-		assertThat(filmsOptional)
-				.isPresent()
-				.hasValueSatisfying(films ->
-						assertThat(films.size()).isEqualTo(0)
-				);
+        filmStorage.removeFilm(1);
+        filmsOptional = Optional.of(filmStorage.getFilms());
+        assertThat(filmsOptional)
+                .isPresent()
+                .hasValueSatisfying(films ->
+                        assertThat(films.size()).isEqualTo(0)
+                );
 
     }
 

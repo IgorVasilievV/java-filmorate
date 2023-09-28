@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.service.user;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -80,7 +79,7 @@ public class UserService {
     }
 
     public void addFriend(long idUser, long idFriend) {
-        userStorage.addFriend(idUser,idFriend);
+        userStorage.addFriend(idUser, idFriend);
     }
 
     public void deleteFriend(long idUser, long idFriend) {

@@ -19,12 +19,12 @@ public class MpaController {
     private final MpaService mpaService;
 
     @GetMapping
-    public List<Mpa> getMpaes () {
+    public List<Mpa> getMpaes() {
         return mpaService.getMpaes();
     }
 
     @GetMapping("/{id}")
-    public Mpa getGenre (@PathVariable long id){
+    public Mpa getGenre(@PathVariable long id) {
         return mpaService.getMpa(id);
     }
 
