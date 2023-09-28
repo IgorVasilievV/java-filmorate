@@ -10,9 +10,10 @@ import java.util.Map;
 
 @Repository("filmDbStorage")
 @RequiredArgsConstructor
-public class FilmDbStorage implements FilmStorage{
+public class FilmDbStorage implements FilmStorage {
 
     private final FilmDao filmDao;
+
     @Override
     public Map<Long, Film> getFilms() {
         return filmDao.getFilms();
