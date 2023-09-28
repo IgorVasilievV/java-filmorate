@@ -6,11 +6,11 @@ ER диаграмма проекта  Filmorate:
 ![picture](/src/main/resources/filmorate.png)
 
 Пример базовых запросов к базе данных:
-1. Список всех фильмов
+1. Список названий всех фильмов
 ```
 select film_name from films;
 ```
 2. Данные юзера с id = 2
 ```
-select * from users where user_id = 3;
+select * from users where user_id = 2;
 ```
