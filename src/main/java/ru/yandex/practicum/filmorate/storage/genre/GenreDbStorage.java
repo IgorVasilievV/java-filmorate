@@ -21,8 +21,8 @@ public class GenreDbStorage implements GenreStorage {
 
     @Override
     public Genre getGenre(long id) {
-        return genreDao.
-                getGenre(id)
+        return genreDao
+                .getGenre(id)
                 .orElseThrow(() -> new NotFoundException("Не найден Genre с id = " + id));
     }
 }
