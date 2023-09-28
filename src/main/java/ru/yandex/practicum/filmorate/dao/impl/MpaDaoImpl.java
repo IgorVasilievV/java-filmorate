@@ -41,7 +41,7 @@ public class MpaDaoImpl implements MpaDao {
     @Override
     public List<Mpa> getMpaes() {
         String sql = "select * from mpa";
-        return jdbcTemplate.query(sql, (rs, rowNum)-> makeMpa(rs));
+        return jdbcTemplate.query(sql, (rs, rowNum) -> makeMpa(rs));
     }
 
     private Mpa makeMpa(ResultSet rs) throws SQLException {
