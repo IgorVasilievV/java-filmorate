@@ -1,7 +1,9 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
+import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.models.Film;
 
+import java.util.HashSet;
 import java.util.Map;
 
 public interface FilmStorage {
@@ -15,4 +17,7 @@ public interface FilmStorage {
 
     Film removeFilm(long id);
 
+    public void addLike(long idFilm, long idUser);
+
+    public void deleteLike(long idFilm, long idUser);
 }

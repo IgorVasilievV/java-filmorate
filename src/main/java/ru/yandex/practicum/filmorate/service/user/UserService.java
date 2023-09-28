@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.service.user;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
@@ -14,21 +15,28 @@ import java.util.regex.Pattern;
 
 @Service
 @Slf4j
-@RequiredArgsConstructor
 public class UserService {
+    private UserStorage userStorage;
 
-    private final UserStorage userStorage;
+    public UserService(@Qualifier("userDbStorage") UserStorage userStorage) {
+        this.userStorage = userStorage;
+    }
 
     public User createUser(User user) {
         validationBeforeCreateUser(user);
+        if (user.getName() == null || user.getName().isBlank()) {
+            user.setName(user.getLogin());
+        }
         userStorage.createUser(user);
         log.debug("Добавлен пользователь: {}", user);
         return user;
     }
 
-
     public User updateUser(User user) {
         validationBeforeUpdatedUser(user);
+        if (user.getName() == null || user.getName().isBlank()) {
+            user.setName(user.getLogin());
+        }
         userStorage.updateUser(user);
         log.debug("Данные пользователя id= {} обновлены. Новые данные: {}", user.getId(), user);
         return user;
@@ -72,48 +80,15 @@ public class UserService {
     }
 
     public void addFriend(long idUser, long idFriend) {
-        if (userStorage.getUsers().keySet().containsAll(List.of(idUser, idFriend))) {
-            User user = userStorage.getUsers().get(idUser);
-            User friend = userStorage.getUsers().get(idFriend);
-            if (user.getFriendsIds() == null) {
-                user.setFriendsIds(new HashSet<>());
-            }
-            if (friend.getFriendsIds() == null) {
-                friend.setFriendsIds(new HashSet<>());
-            }
-            user.getFriendsIds().add(idFriend);
-            friend.getFriendsIds().add(idUser);
-        } else {
-            throw new NotFoundException("В хранилище нет указанных id");
-        }
+        userStorage.addFriend(idUser,idFriend);
     }
 
     public void deleteFriend(long idUser, long idFriend) {
-        if (userStorage.getUsers().keySet().containsAll(List.of(idUser, idFriend))) {
-            User user = userStorage.getUsers().get(idUser);
-            User friend = userStorage.getUsers().get(idFriend);
-            if (user.getFriendsIds() != null) {
-                user.getFriendsIds().remove(idFriend);
-            }
-            if (friend.getFriendsIds() != null) {
-                friend.getFriendsIds().remove(idUser);
-            }
-        } else {
-            throw new NotFoundException("В хранилище нет указанных id");
-        }
+        userStorage.deleteFriend(idUser, idFriend);
     }
 
     public List<User> getFriends(long idUser) {
-        if (userStorage.getUsers().containsKey(idUser)) {
-            List<User> friends = new ArrayList<>();
-            if (userStorage.getUsers().get(idUser).getFriendsIds() != null) {
-                Set<Long> idFriend = userStorage.getUsers().get(idUser).getFriendsIds();
-                idFriend.forEach(s -> friends.add(userStorage.getUsers().get(s)));
-            }
-            return friends;
-        } else {
-            throw new NotFoundException("В хранилище нет указанных id");
-        }
+        return userStorage.getFriends(idUser);
     }
 
     public List<User> getCommonFriends(long idUser, long idFriend) {
@@ -122,8 +97,8 @@ public class UserService {
             User friend = userStorage.getUsers().get(idFriend);
             List<User> commonFriends = new ArrayList<>();
             if (user.getFriendsIds() != null && friend.getFriendsIds() != null) {
-                Set<Long> idCommonFriends = new HashSet<>(user.getFriendsIds());
-                idCommonFriends.retainAll(friend.getFriendsIds());
+                Set<Long> idCommonFriends = new HashSet<>(user.getFriendsIds().keySet());
+                idCommonFriends.retainAll(friend.getFriendsIds().keySet());
                 if (!idCommonFriends.isEmpty()) {
                     idCommonFriends.forEach(s -> commonFriends.add(userStorage.getUsers().get(s)));
                 }

@@ -1,7 +1,8 @@
 package ru.yandex.practicum.filmorate.service.film;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
@@ -16,12 +17,18 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
-@RequiredArgsConstructor
 public class FilmService {
-
     private final LocalDate birthdayCinema = LocalDate.of(1895, Month.DECEMBER, 28);
-    private final FilmStorage filmStorage;
-    private final UserStorage userStorage;
+
+    private FilmStorage filmStorage;
+    private UserStorage userStorage;
+
+    @Autowired
+    public FilmService(@Qualifier("filmDbStorage") FilmStorage filmStorage,
+                       @Qualifier("userDbStorage") UserStorage userStorage) {
+        this.filmStorage = filmStorage;
+        this.userStorage = userStorage;
+    }
 
     public Film addFilm(Film film) {
         validateFilmBeforeAdded(film);
@@ -79,26 +86,11 @@ public class FilmService {
     }
 
     public void addLike(long idFilm, long idUser) {
-        if (filmStorage.getFilms().containsKey(idFilm) && userStorage.getUsers().containsKey(idUser)) {
-            Film film = filmStorage.getFilms().get(idFilm);
-            if (film.getLikes() == null) {
-                film.setLikes(new HashSet<>());
-            }
-            film.getLikes().add(idUser);
-        } else {
-            throw new NotFoundException("В хранилище нет указанных id");
-        }
+        filmStorage.addLike(idFilm, idUser);
     }
 
     public void deleteLike(long idFilm, long idUser) {
-        if (filmStorage.getFilms().containsKey(idFilm) && userStorage.getUsers().containsKey(idUser)) {
-            Film film = filmStorage.getFilms().get(idFilm);
-            if (film.getLikes() != null) {
-                film.getLikes().remove(idUser);
-            }
-        } else {
-            throw new NotFoundException("В хранилище нет указанных id");
-        }
+       filmStorage.deleteLike(idFilm, idUser);
     }
 
     public Set<Film> getPopularFilms(int count) {

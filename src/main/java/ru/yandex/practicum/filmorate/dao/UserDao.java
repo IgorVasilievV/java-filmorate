@@ -1,19 +1,19 @@
-package ru.yandex.practicum.filmorate.storage.user;
+package ru.yandex.practicum.filmorate.dao;
 
-import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.models.User;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
-public interface UserStorage {
-
+public interface UserDao {
     Map<Long, User> getUsers();
 
-    User getUser(long id);
+    Optional<User> getUser(long id);
 
     User createUser(User user);
 
-    User updateUser(User user);
+    Optional<User> updateUser(User user);
 
     User removeUser(long id);
 

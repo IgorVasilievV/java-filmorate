@@ -1,14 +1,15 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.models.Film;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 
-@Component
+@Repository("inMemoryFilmStorage")
 public class InMemoryFilmStorage implements FilmStorage {
     private final Map<Long, Film> films = new HashMap<>();
     private long id = 0;
@@ -46,5 +47,29 @@ public class InMemoryFilmStorage implements FilmStorage {
     public Film removeFilm(long id) {
         return Optional.ofNullable(films.remove(id))
                 .orElseThrow(() -> new NotFoundException("В хранилище нет фильма с id = " + id));
+    }
+    @Override
+    public void addLike(long idFilm, long idUser) {
+        if (films.containsKey(idFilm)) {
+            Film film = films.get(idFilm);
+            if (film.getLikes() == null) {
+                film.setLikes(new HashSet<>());
+            }
+            film.getLikes().add(idUser);
+        } else {
+            throw new NotFoundException("В хранилище нет указанных id");
+        }
+    }
+
+    @Override
+    public void deleteLike(long idFilm, long idUser) {
+        if (films.containsKey(idFilm)) {
+            Film film = films.get(idFilm);
+            if (film.getLikes() != null) {
+                film.getLikes().remove(idUser);
+            }
+        } else {
+            throw new NotFoundException("В хранилище нет указанных id");
+        }
     }
 }
