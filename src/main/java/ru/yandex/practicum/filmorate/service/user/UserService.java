@@ -11,6 +11,7 @@ import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -50,7 +51,7 @@ public class UserService {
     }
 
     public List<User> getAllUsers() {
-        return new ArrayList<>(userStorage.getUsers().values());
+        return userStorage.getUsers();
     }
 
     private void validationBeforeCreateUser(User user) throws ValidationException {
@@ -71,7 +72,8 @@ public class UserService {
     }
 
     private void validationBeforeUpdatedUser(User user) throws ValidationException {
-        if (!userStorage.getUsers().containsKey(user.getId())) {
+        Set<Long> usersId = userStorage.getUsers().stream().map(u -> u.getId()).collect(Collectors.toSet());
+        if (!usersId.contains(user.getId())) {
             NotFoundException e = new NotFoundException("Пользователь с id= " + user.getId() + " не найден");
             log.debug("Валидация не пройдена. " + e.getMessage());
             throw e;
@@ -91,15 +93,16 @@ public class UserService {
     }
 
     public List<User> getCommonFriends(long idUser, long idFriend) {
-        if (userStorage.getUsers().keySet().containsAll(List.of(idUser, idFriend))) {
-            User user = userStorage.getUsers().get(idUser);
-            User friend = userStorage.getUsers().get(idFriend);
+        List<Long> usersId = userStorage.getUsers().stream().map(u -> u.getId()).collect(Collectors.toList());
+        if (usersId.containsAll(List.of(idUser, idFriend))) {
+            User user = userStorage.getUser(idUser);
+            User friend = userStorage.getUser(idFriend);
             List<User> commonFriends = new ArrayList<>();
             if (user.getFriendsIds() != null && friend.getFriendsIds() != null) {
                 Set<Long> idCommonFriends = new HashSet<>(user.getFriendsIds().keySet());
                 idCommonFriends.retainAll(friend.getFriendsIds().keySet());
                 if (!idCommonFriends.isEmpty()) {
-                    idCommonFriends.forEach(s -> commonFriends.add(userStorage.getUsers().get(s)));
+                    idCommonFriends.forEach(s -> commonFriends.add(userStorage.getUser(s)));
                 }
             }
             return commonFriends;

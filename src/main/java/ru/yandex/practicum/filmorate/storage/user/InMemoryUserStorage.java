@@ -12,8 +12,8 @@ public class InMemoryUserStorage implements UserStorage {
     private long id = 0;
 
     @Override
-    public Map<Long, User> getUsers() {
-        return users;
+    public List<User> getUsers() {
+        return new ArrayList<>(users.values());
     }
 
     @Override

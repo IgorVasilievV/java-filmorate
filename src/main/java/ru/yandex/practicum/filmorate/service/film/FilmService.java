@@ -39,9 +39,9 @@ public class FilmService {
 
     public Film updateFilm(Film film) {
         validateFilmBeforeUpdated(film);
-        filmStorage.updateFilm(film);
-        log.debug("Обновлен фильм id={}. Новые данные: {}", film.getId(), film);
-        return film;
+        Film newFilm = filmStorage.updateFilm(film);
+        log.debug("Обновлен фильм id={}. Новые данные: {}", newFilm.getId(), newFilm);
+        return newFilm;
     }
 
     public Film getFilm(long id) {
@@ -53,7 +53,7 @@ public class FilmService {
     }
 
     public List<Film> getAllFilms() {
-        return new ArrayList<>(filmStorage.getFilms().values());
+        return filmStorage.getFilms();
     }
 
 
@@ -78,7 +78,8 @@ public class FilmService {
     }
 
     private void validateFilmBeforeUpdated(Film film) throws ValidationException {
-        if (!filmStorage.getFilms().containsKey(film.getId())) {
+        Set<Long> filmsId = filmStorage.getFilms().stream().map(f -> f.getId()).collect(Collectors.toSet());
+        if (!filmsId.contains(film.getId())) {
             NotFoundException e = new NotFoundException("Фильм с id= " + film.getId() + " не найден");
             log.debug("Валидация не пройдена. " + e.getMessage());
             throw e;
@@ -94,7 +95,7 @@ public class FilmService {
     }
 
     public Set<Film> getPopularFilms(int count) {
-        Set<Film> popularFilms = filmStorage.getFilms().values().stream()
+        Set<Film> popularFilms = filmStorage.getFilms().stream()
                 .sorted((film1, film2) -> {
                     if (film2.getLikes() != null && film1.getLikes() != null) {
                         return film2.getLikes().size() - film1.getLikes().size();

@@ -6,7 +6,7 @@ import java.util.*;
 
 public interface UserStorage {
 
-    Map<Long, User> getUsers();
+    List<User> getUsers();
 
     User getUser(long id);
 

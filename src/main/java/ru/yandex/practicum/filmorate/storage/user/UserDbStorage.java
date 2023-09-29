@@ -7,7 +7,6 @@ import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.models.User;
 
 import java.util.List;
-import java.util.Map;
 
 @Repository("userDbStorage")
 @RequiredArgsConstructor
@@ -16,7 +15,7 @@ public class UserDbStorage implements UserStorage {
     private final UserDao userDao;
 
     @Override
-    public Map<Long, User> getUsers() {
+    public List<User> getUsers() {
         return userDao.getUsers();
     }
 
@@ -32,8 +31,11 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User updateUser(User user) {
-        return userDao.updateUser(user)
-                .orElseThrow(() -> new NotFoundException("Юзер с id = " + user.getId() + " не обновлен"));
+        if (userDao.updateUser(user) != null) {
+            return userDao.updateUser(user);
+        } else {
+            throw new NotFoundException("Юзер с id = " + user.getId() + " не обновлен");
+        }
     }
 
     @Override

@@ -24,11 +24,11 @@ public class UserDaoImpl implements UserDao {
     private final JdbcTemplate jdbcTemplate;
 
     @Override
-    public Map<Long, User> getUsers() {
+    public List<User> getUsers() {
         String sql = "select user_id from users";
         List<Long> userIds = jdbcTemplate.query(sql, (rs, rowNum) -> rs.getLong("user_id"));
-        Map<Long, User> users = new HashMap<>();
-        userIds.forEach((ids) -> users.put(ids, getUser(ids)
+        List<User> users = new ArrayList<>();
+        userIds.forEach((ids) -> users.add(getUser(ids)
                 .orElseThrow(() -> new NotFoundException("Ошибка заполнения базы"))));
         return users;
     }
@@ -39,13 +39,13 @@ public class UserDaoImpl implements UserDao {
         Integer count = jdbcTemplate.queryForObject("select count(*) from users where user_id = ?",
                 Integer.class, id);
         if (count != null && count > 0) {
-            return jdbcTemplate.queryForObject(sql, (rs, rowNum) -> createUserFromDb(rs, id), id);
+            return Optional.of(jdbcTemplate.queryForObject(sql, (rs, rowNum) -> createUserFromDb(rs, id), id));
         } else {
             return Optional.empty();
         }
     }
 
-    private Optional<User> createUserFromDb(ResultSet rs, long id) throws SQLException {
+    private User createUserFromDb(ResultSet rs, long id) throws SQLException {
         User user = new User()
                 .setId(id)
                 .setEmail(rs.getString("email"))
@@ -53,7 +53,7 @@ public class UserDaoImpl implements UserDao {
                 .setName(rs.getString("user_name"))
                 .setBirthday(rs.getDate("birthday").toLocalDate())
                 .setFriendsIds(createFriendshipFromDb(id));
-        return Optional.of(user);
+        return user;
     }
 
     private Map<Long, Boolean> createFriendshipFromDb(long id) {
@@ -110,7 +110,7 @@ public class UserDaoImpl implements UserDao {
     }
 
     @Override
-    public Optional<User> updateUser(User user) {
+    public User updateUser(User user) {
         String sql = "update users set " +
                 "email = ?, " +
                 "login = ?, " +
@@ -124,10 +124,10 @@ public class UserDaoImpl implements UserDao {
                 user.getBirthday(),
                 user.getId());
         if (statusCompiling > 0) {
-            return Optional.of(user);
+            return user;
         } else {
             log.info("Ошибка обновления фильма: {}", user);
-            return Optional.empty();
+            return null;
         }
     }
 
@@ -141,7 +141,9 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public void addFriend(long idUser, long idFriend) {
-        Map<Long, User> users = getUsers();
+        Map<Long, User> users = new HashMap<>();
+        getUsers().stream().forEach(u -> users.put(u.getId(), u));
+
         if (users.keySet().containsAll(List.of(idUser, idFriend))) {
             User friend = users.get(idFriend);
             if (!friend.getFriendsIds().containsKey(idUser)) {
@@ -158,7 +160,9 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public void deleteFriend(long idUser, long idFriend) {
-        Map<Long, User> users = getUsers();
+        Map<Long, User> users = new HashMap<>();
+        getUsers().stream().forEach(u -> users.put(u.getId(), u));
+
         if (users.keySet().containsAll(List.of(idUser, idFriend)) &&
                 users.get(idUser).getFriendsIds().containsKey(idFriend)) {
             User friend = users.get(idFriend);

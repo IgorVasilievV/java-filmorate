@@ -4,10 +4,7 @@ import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.models.Film;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Repository("inMemoryFilmStorage")
 public class InMemoryFilmStorage implements FilmStorage {
@@ -15,8 +12,8 @@ public class InMemoryFilmStorage implements FilmStorage {
     private long id = 0;
 
     @Override
-    public Map<Long, Film> getFilms() {
-        return films;
+    public List<Film> getFilms() {
+        return new ArrayList<>(films.values());
     }
 
     @Override

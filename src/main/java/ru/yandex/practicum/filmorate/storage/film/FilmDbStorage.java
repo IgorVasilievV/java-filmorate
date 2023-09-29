@@ -6,7 +6,7 @@ import ru.yandex.practicum.filmorate.dao.FilmDao;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.models.Film;
 
-import java.util.Map;
+import java.util.List;
 
 @Repository("filmDbStorage")
 @RequiredArgsConstructor
@@ -15,7 +15,7 @@ public class FilmDbStorage implements FilmStorage {
     private final FilmDao filmDao;
 
     @Override
-    public Map<Long, Film> getFilms() {
+    public List<Film> getFilms() {
         return filmDao.getFilms();
     }
 
@@ -32,8 +32,11 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film updateFilm(Film film) {
-        return filmDao.updateFilm(film)
-                .orElseThrow(() -> new NotFoundException("Фильм с id = " + film.getId() + " не обновлен"));
+        if (filmDao.updateFilm(film) != null) {
+            return filmDao.updateFilm(film);
+        } else {
+            throw new NotFoundException("Фильм с id = " + film.getId() + " не обновлен");
+        }
     }
 
     @Override

@@ -30,11 +30,11 @@ public class FilmDaoImpl implements FilmDao {
     private final GenreService genreService;
 
     @Override
-    public Map<Long, Film> getFilms() {
+    public List<Film> getFilms() {
         String sql = "select film_id from films";
         List<Long> filmIds = jdbcTemplate.query(sql, (rs, rowNum) -> rs.getLong("film_id"));
-        Map<Long, Film> films = new HashMap<>();
-        filmIds.forEach((ids) -> films.put(ids, getFilm(ids)
+        List<Film> films = new ArrayList<>();
+        filmIds.forEach((ids) -> films.add(getFilm(ids)
                 .orElseThrow(() -> new NotFoundException("Ошибка заполнения базы"))));
         return films;
     }
@@ -44,13 +44,13 @@ public class FilmDaoImpl implements FilmDao {
         String sql = "select * from films where film_id = ?";
         Integer count = jdbcTemplate.queryForObject("select count(*) from films where film_id = ?", Integer.class, id);
         if (count != null && count > 0) {
-            return jdbcTemplate.queryForObject(sql, (rs, rowNum) -> createFilm(rs, id), id);
+            return Optional.of(jdbcTemplate.queryForObject(sql, (rs, rowNum) -> createFilm(rs, id), id));
         } else {
             return Optional.empty();
         }
     }
 
-    private Optional<Film> createFilm(ResultSet rs, long id) throws SQLException {
+    private Film createFilm(ResultSet rs, long id) throws SQLException {
         Film film = new Film()
                 .setId(id)
                 .setName(rs.getString("film_name"))
@@ -60,7 +60,7 @@ public class FilmDaoImpl implements FilmDao {
                 .setMpa(mpaService.getMpa(rs.getInt("mpa_id")))
                 .setLikes(findLikesInDB(id))
                 .setGenres(findGenresInDB(id));
-        return Optional.of(film);
+        return film;
     }
 
     private Set<Long> findLikesInDB(long id) {
@@ -127,7 +127,7 @@ public class FilmDaoImpl implements FilmDao {
     }
 
     @Override
-    public Optional<Film> updateFilm(Film film) {
+    public Film updateFilm(Film film) {
         String sql = "update films set " +
                 "film_name = ?, " +
                 "description = ?, " +
@@ -155,10 +155,10 @@ public class FilmDaoImpl implements FilmDao {
             if (film.getLikes() != null) {
                 addLikesToFilmInDB(film.getId(), film.getLikes());
             }
-            return Optional.of(film);
+            return film;
         } else {
             log.info("Ошибка обновления фильма: {}", film);
-            return Optional.empty();
+            return null;
         }
     }
 

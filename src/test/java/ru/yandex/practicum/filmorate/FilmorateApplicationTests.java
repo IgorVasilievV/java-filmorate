@@ -16,7 +16,6 @@ import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -74,7 +73,7 @@ class FilmorateApplicationTests {
                         assertThat(user).hasFieldOrPropertyWithValue("name", "newName")
                 );
 
-        Optional<Map<Long, User>> usersOptional = Optional.of(userStorage.getUsers());
+        Optional<List<User>> usersOptional = Optional.of(userStorage.getUsers());
         assertThat(usersOptional)
                 .isPresent()
                 .hasValueSatisfying(users ->
@@ -129,7 +128,7 @@ class FilmorateApplicationTests {
                         assertThat(film).hasFieldOrPropertyWithValue("name", "newName")
                 );
 
-        Optional<Map<Long, Film>> filmsOptional = Optional.of(filmStorage.getFilms());
+        Optional<List<Film>> filmsOptional = Optional.of(filmStorage.getFilms());
         assertThat(filmsOptional)
                 .isPresent()
                 .hasValueSatisfying(films ->

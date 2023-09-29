@@ -2,17 +2,17 @@ package ru.yandex.practicum.filmorate.dao;
 
 import ru.yandex.practicum.filmorate.models.Film;
 
-import java.util.Map;
+import java.util.List;
 import java.util.Optional;
 
 public interface FilmDao {
-    Map<Long, Film> getFilms();
+    List<Film> getFilms();
 
     Optional<Film> getFilm(long id);
 
     Film addFilm(Film film);
 
-    Optional<Film> updateFilm(Film film);
+    Film updateFilm(Film film);
 
     Film removeFilm(long id);
 
