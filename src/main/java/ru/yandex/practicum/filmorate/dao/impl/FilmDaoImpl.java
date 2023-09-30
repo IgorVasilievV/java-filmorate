@@ -33,6 +33,8 @@ public class FilmDaoImpl implements FilmDao {
     public List<Film> getFilms() {
         String sql = "select film_id from films";
         List<Long> filmIds = jdbcTemplate.query(sql, (rs, rowNum) -> rs.getLong("film_id"));
+        Collections.sort(filmIds);
+        log.info("film sorted" + filmIds);
         List<Film> films = new ArrayList<>();
         filmIds.forEach((ids) -> films.add(getFilm(ids)
                 .orElseThrow(() -> new NotFoundException("Ошибка заполнения базы"))));

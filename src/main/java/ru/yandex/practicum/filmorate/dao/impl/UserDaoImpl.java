@@ -27,6 +27,7 @@ public class UserDaoImpl implements UserDao {
     public List<User> getUsers() {
         String sql = "select user_id from users";
         List<Long> userIds = jdbcTemplate.query(sql, (rs, rowNum) -> rs.getLong("user_id"));
+        Collections.sort(userIds);
         List<User> users = new ArrayList<>();
         userIds.forEach((ids) -> users.add(getUser(ids)
                 .orElseThrow(() -> new NotFoundException("Ошибка заполнения базы"))));
