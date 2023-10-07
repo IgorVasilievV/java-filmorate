@@ -1,7 +1,8 @@
 package ru.yandex.practicum.filmorate.service.film;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
@@ -16,12 +17,18 @@ import java.util.stream.Collectors;
 
 @Service
 @Slf4j
-@RequiredArgsConstructor
 public class FilmService {
-
     private final LocalDate birthdayCinema = LocalDate.of(1895, Month.DECEMBER, 28);
-    private final FilmStorage filmStorage;
-    private final UserStorage userStorage;
+
+    private FilmStorage filmStorage;
+    private UserStorage userStorage;
+
+    @Autowired
+    public FilmService(@Qualifier("filmDbStorage") FilmStorage filmStorage,
+                       @Qualifier("userDbStorage") UserStorage userStorage) {
+        this.filmStorage = filmStorage;
+        this.userStorage = userStorage;
+    }
 
     public Film addFilm(Film film) {
         validateFilmBeforeAdded(film);
@@ -32,9 +39,9 @@ public class FilmService {
 
     public Film updateFilm(Film film) {
         validateFilmBeforeUpdated(film);
-        filmStorage.updateFilm(film);
-        log.debug("Обновлен фильм id={}. Новые данные: {}", film.getId(), film);
-        return film;
+        Film newFilm = filmStorage.updateFilm(film);
+        log.debug("Обновлен фильм id={}. Новые данные: {}", newFilm.getId(), newFilm);
+        return newFilm;
     }
 
     public Film getFilm(long id) {
@@ -46,7 +53,7 @@ public class FilmService {
     }
 
     public List<Film> getAllFilms() {
-        return new ArrayList<>(filmStorage.getFilms().values());
+        return filmStorage.getFilms();
     }
 
 
@@ -71,7 +78,8 @@ public class FilmService {
     }
 
     private void validateFilmBeforeUpdated(Film film) throws ValidationException {
-        if (!filmStorage.getFilms().containsKey(film.getId())) {
+        Set<Long> filmsId = filmStorage.getFilms().stream().map(f -> f.getId()).collect(Collectors.toSet());
+        if (!filmsId.contains(film.getId())) {
             NotFoundException e = new NotFoundException("Фильм с id= " + film.getId() + " не найден");
             log.debug("Валидация не пройдена. " + e.getMessage());
             throw e;
@@ -79,30 +87,15 @@ public class FilmService {
     }
 
     public void addLike(long idFilm, long idUser) {
-        if (filmStorage.getFilms().containsKey(idFilm) && userStorage.getUsers().containsKey(idUser)) {
-            Film film = filmStorage.getFilms().get(idFilm);
-            if (film.getLikes() == null) {
-                film.setLikes(new HashSet<>());
-            }
-            film.getLikes().add(idUser);
-        } else {
-            throw new NotFoundException("В хранилище нет указанных id");
-        }
+        filmStorage.addLike(idFilm, idUser);
     }
 
     public void deleteLike(long idFilm, long idUser) {
-        if (filmStorage.getFilms().containsKey(idFilm) && userStorage.getUsers().containsKey(idUser)) {
-            Film film = filmStorage.getFilms().get(idFilm);
-            if (film.getLikes() != null) {
-                film.getLikes().remove(idUser);
-            }
-        } else {
-            throw new NotFoundException("В хранилище нет указанных id");
-        }
+        filmStorage.deleteLike(idFilm, idUser);
     }
 
     public Set<Film> getPopularFilms(int count) {
-        Set<Film> popularFilms = filmStorage.getFilms().values().stream()
+        Set<Film> popularFilms = filmStorage.getFilms().stream()
                 .sorted((film1, film2) -> {
                     if (film2.getLikes() != null && film1.getLikes() != null) {
                         return film2.getLikes().size() - film1.getLikes().size();

@@ -21,8 +21,8 @@ public class Film {
     private String description;
     private LocalDate releaseDate;
     @Positive
-    private double duration;
-    Set<Long> likes;
-
-
+    private int duration;
+    private Set<Long> likes;
+    private Mpa mpa;
+    private Set<Genre> genres;
 }
